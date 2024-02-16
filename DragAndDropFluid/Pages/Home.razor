@@ -1,0 +1,31 @@
+﻿@page "/"
+@using DragAndDropFluid.Model
+@using DragAndDropFluid.Pages.Components
+<center><p>- 1 - </p></center>
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+
+<b>!This is only a proof of concept!</b>
+
+<DragContainer Width="1000px" Height="1000px">
+	<DragableDiv Position="Position1" Size="Size1">
+	</DragableDiv>
+	<DragableDiv Position="Position2" Size="Size2">
+		<p>This is a paragraph</p>
+	</DragableDiv>
+	<DragableDiv Position="Position3" Size="Size3">
+		<p>And another</p>
+	</DragableDiv>
+</DragContainer>
+
+@code{
+	private Point2d Position1 = new Point2d(0, 0);
+	private Point2d Size1 = new Point2d(200, 100);
+
+	private Point2d Position2 = new Point2d(0, 0);
+	private Point2d Size2 = new Point2d(200, 100);
+
+	private Point2d Position3 = new Point2d(0, 0);
+	private Point2d Size3 = new Point2d(200, 100);
+}

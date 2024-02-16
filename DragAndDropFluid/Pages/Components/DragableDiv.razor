@@ -1,0 +1,40 @@
+﻿@using DragAndDropFluid.Model
+
+<div 
+	class="ns-dragable-div noselect" 
+	style="left:@(Position.X)px;top:@(Position.Y)px;position:absolute;background:#50586D;width:@(Size.X)px;height:@(Size.Y)px" 
+	@onmousedown="OnMouseDown" 
+	@onmouseup="OnMouseUp">
+	@ChildContent
+</div>
+
+@code {
+
+	[Parameter] public Point2d Position { get; set; }
+	[Parameter] public Point2d Size { get; set; }
+
+	[CascadingParameter] public DragContainer Parent { get; set; }
+	[Parameter] public RenderFragment ChildContent { get; set; }
+
+	public int Column{ get; set; }
+	public int Row{ get; set; }
+
+	public int Index { get; set; } = -1;
+
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+
+		Index = Parent.AddDragItem(this);
+	}
+
+	private void OnMouseDown(MouseEventArgs e)
+	{
+		Parent.NotifyMouseDown(Index);
+	}
+
+	private void OnMouseUp(MouseEventArgs e)
+	{
+		Parent.NotifyMouseUp(Index);
+	}
+}

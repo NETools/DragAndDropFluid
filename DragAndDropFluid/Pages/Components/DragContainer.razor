@@ -1,0 +1,97 @@
+﻿@using System.Drawing
+
+<div style="width:@Width;height:@Height;background:#918f87;position:relative" @onmousemove="OnMouseMove">
+	<CascadingValue Value="@this">
+		@ChildContent
+	</CascadingValue>
+</div>
+
+@code {
+
+	[Parameter] public string Width { get; set; }
+	[Parameter] public string Height { get; set; }
+	[Parameter] public RenderFragment ChildContent { get; set; }
+
+	private List<DragableDiv> DragableItems = [];
+
+	private int _lastSelectedIndex = -1;
+
+	private void OnMouseMove(MouseEventArgs e)
+	{
+		if (_lastSelectedIndex == -1)
+			return;
+
+		var selectedItem = DragableItems[_lastSelectedIndex];
+
+		selectedItem.Position.X += (float)e.MovementX;
+		selectedItem.Position.Y += (float)e.MovementY;
+
+		HandleCollision(selectedItem);
+	}
+
+	public int AddDragItem(DragableDiv item)
+	{
+		DragableItems.Add(item);
+		HandleCollision(item);
+		return DragableItems.Count - 1;
+	}
+
+	private void HandleCollision(DragableDiv item)
+	{
+		var itemRectangle = new RectangleF(item.Position.X, item.Position.Y, item.Size.X, item.Size.Y);
+
+		for (int i = 0; i < DragableItems.Count; i++)
+		{
+			var element = DragableItems[i];
+
+			if (element.Index == item.Index || element.Index == _lastSelectedIndex)
+			{
+				continue;
+			}
+
+			var rectangle = new RectangleF(element.Position.X, element.Position.Y, element.Size.X, element.Size.Y);
+
+			if (rectangle.IntersectsWith(itemRectangle))
+			{
+
+				element.Position.Y += element.Size.Y;
+
+				AdjustPosition(element);
+				HandleCollision(element);
+			}
+		}
+
+	}
+
+	public void NotifyMouseDown(int index)
+	{
+		_lastSelectedIndex = index;
+	}
+
+	private void AdjustPosition(DragableDiv item)
+	{
+		int offsetWidth = (int)(item.Size.X * 0.25);
+		var column = (int)(item.Position.X / (item.Size.X * 0.25));
+
+		int offsetHeight = (int)(item.Size.Y * 0.25);
+		var row = (int)(item.Position.Y / (item.Size.Y * 0.25));
+
+		item.Column = column;
+		item.Row = row;
+
+		item.Position.X = column * offsetWidth;
+		item.Position.Y = row * offsetHeight;
+	}
+
+	public void NotifyMouseUp(int index)
+	{
+		if (_lastSelectedIndex != index)
+			return;
+
+		var selectedItem = DragableItems[_lastSelectedIndex];
+
+		AdjustPosition(selectedItem);
+
+		_lastSelectedIndex = -1;
+	}
+}
