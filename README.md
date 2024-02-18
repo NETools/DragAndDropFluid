@@ -2,4 +2,4 @@
 
 ## Proof of concept
 
-![Demo](https://github.com/NETools/DragAndDropFluid/blob/master/DragAndDropFluid/BlazorDemo.gif)
+![Demo](https://github.com/NETools/DragAndDropFluid/blob/master/DragAndDropFluid/AufgabeDemo.gif)
