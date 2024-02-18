@@ -1,7 +1,12 @@
 ﻿@using System.Drawing
+@using DragAndDropFluid.Adapters
+@using DragAndDropFluid.Model
 
 <div style="width:@Width;height:@Height;background:#918f87;position:relative" @onmousemove="OnMouseMove">
 	<CascadingValue Value="@this">
+		<Placeholder @ref="PlaceHolder">
+		</Placeholder>
+
 		@ChildContent
 	</CascadingValue>
 </div>
@@ -12,86 +17,39 @@
 	[Parameter] public string Height { get; set; }
 	[Parameter] public RenderFragment ChildContent { get; set; }
 
-	private List<DragableDiv> DragableItems = [];
+	public List<DragableDiv> DragableItems { get; private set; } = [];
 
-	private int _lastSelectedIndex = -1;
+	public Placeholder PlaceHolder { get; set; }
+
+	private DragAdapter _adapter;
+
+	protected override void OnAfterRender(bool firstRender)
+	{
+		base.OnAfterRender(firstRender);
+		if (firstRender)
+		{
+			_adapter = new DragAdapter(this, PlaceHolder);
+		}
+	}
 
 	private void OnMouseMove(MouseEventArgs e)
 	{
-		if (_lastSelectedIndex == -1)
-			return;
-
-		var selectedItem = DragableItems[_lastSelectedIndex];
-
-		selectedItem.Position.X += (float)e.MovementX;
-		selectedItem.Position.Y += (float)e.MovementY;
-
-		HandleCollision(selectedItem);
+		_adapter.DragMove(e.MovementX, e.MovementY);
 	}
 
 	public int AddDragItem(DragableDiv item)
 	{
 		DragableItems.Add(item);
-		HandleCollision(item);
 		return DragableItems.Count - 1;
-	}
-
-	private void HandleCollision(DragableDiv item)
-	{
-		var itemRectangle = new RectangleF(item.Position.X, item.Position.Y, item.Size.X, item.Size.Y);
-
-		for (int i = 0; i < DragableItems.Count; i++)
-		{
-			var element = DragableItems[i];
-
-			if (element.Index == item.Index || element.Index == _lastSelectedIndex)
-			{
-				continue;
-			}
-
-			var rectangle = new RectangleF(element.Position.X, element.Position.Y, element.Size.X, element.Size.Y);
-
-			if (rectangle.IntersectsWith(itemRectangle))
-			{
-
-				element.Position.Y += element.Size.Y;
-
-				AdjustPosition(element);
-				HandleCollision(element);
-			}
-		}
-
 	}
 
 	public void NotifyMouseDown(int index)
 	{
-		_lastSelectedIndex = index;
+		_adapter.DragStart(index);
 	}
 
-	private void AdjustPosition(DragableDiv item)
+	public void NotifyMouseUp()
 	{
-		int offsetWidth = (int)(item.Size.X * 0.25);
-		var column = (int)(item.Position.X / (item.Size.X * 0.25));
-
-		int offsetHeight = (int)(item.Size.Y * 0.25);
-		var row = (int)(item.Position.Y / (item.Size.Y * 0.25));
-
-		item.Column = column;
-		item.Row = row;
-
-		item.Position.X = column * offsetWidth;
-		item.Position.Y = row * offsetHeight;
-	}
-
-	public void NotifyMouseUp(int index)
-	{
-		if (_lastSelectedIndex != index)
-			return;
-
-		var selectedItem = DragableItems[_lastSelectedIndex];
-
-		AdjustPosition(selectedItem);
-
-		_lastSelectedIndex = -1;
+		_adapter.Drop();
 	}
 }

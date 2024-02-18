@@ -1,0 +1,46 @@
+﻿@using DragAndDropFluid.Model
+
+<div 
+	class="ns-dragable-div noselect"
+	 style="box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px, rgb(51, 51, 51) 0px 0px 0px 3px;visibility:@Visible;left:@(Position.X)px;top:@(Position.Y)px;position:absolute;background:#918f87;width:@(Size.X)px;height:@(Size.Y)px">
+	@ChildContent
+</div>
+
+@code {
+
+	public Point2d Position { get; set; } = new Point2d(0, 0);
+	public Point2d Size { get; set; } = new Point2d(10, 10);
+
+	[Parameter] public RenderFragment ChildContent { get; set; }
+
+	public int Column { get; set; }
+	public int Row { get; set; }
+
+	public int Index { get; set; } = -1;
+
+	private string Visible = "hidden";
+
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+	}
+
+	public void ToggleVisibility()
+	{
+		Visible = (Visible == "hidden") ? "visible" : "hidden";
+		Update();
+	}
+
+	public void Update()
+	{
+		StateHasChanged();
+	}
+
+	public void CopyFrom(DragableDiv item)
+	{
+		Position = new Point2d(item.Position.X, item.Position.Y);
+		Size = new Point2d(item.Size.X, item.Size.Y);
+		Column = item.Column;
+		Row = item.Row;
+	}
+}
