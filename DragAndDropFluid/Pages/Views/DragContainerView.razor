@@ -2,7 +2,7 @@
 @using DragAndDropFluid.Adapters
 @using DragAndDropFluid.Model
 
-<div style="width:@Width;height:@Height;background:#918f87;position:relative" @onmousemove="OnMouseMove">
+<div style="touch-action:none;width:@Width;height:@Height;background:#918f87;position:relative" @onmousemove="OnMouseMove" @ontouchmove="OnTouchMove">
 	<CascadingValue Value="@this">
 		<PlaceholderView @ref="PlaceHolder">
 		</PlaceholderView>
@@ -32,16 +32,51 @@
 		}
 	}
 
-	private void OnMouseMove(MouseEventArgs e)
+
+	private TouchPoint? _referencePoint = null;
+
+	private void OnTouchMove(TouchEventArgs e)
 	{
-		_adapter.DragMove(e.MovementX, e.MovementY);
+		if (_referencePoint == null)
+		{
+			return;
+		}
+
+		var endReferencePoint = e.TargetTouches[0];
+
+		var diffX = endReferencePoint.ClientX - _referencePoint.ClientX;
+		var diffY = endReferencePoint.ClientY - _referencePoint.ClientY;
+
+		_referencePoint = endReferencePoint;
+
+		_adapter.DragMove(diffX, diffY);
+
 	}
 
+	public void NotifyTouchStart(TouchEventArgs e, int index)
+	{
+		_referencePoint = e.TargetTouches[0];
+		_adapter.DragStart(index);
+	}
+
+	public void NotifyTouchEnd(TouchEventArgs e)
+	{
+		_adapter.Drop();
+		//_referencePoint = null;
+	}
+
+	
 	public int AddDragItem(DragableItemView item)
 	{
 		DragableItems.Add(item);
 		return DragableItems.Count - 1;
 	}
+
+	private void OnMouseMove(MouseEventArgs e)
+	{
+		_adapter.DragMove(e.MovementX, e.MovementY);
+	}
+
 
 	public void NotifyMouseDown(int index)
 	{

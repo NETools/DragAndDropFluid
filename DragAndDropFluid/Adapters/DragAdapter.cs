@@ -38,7 +38,7 @@ namespace DragAndDropFluid.Adapters
 			{
 				if (placeholder.Column != Column)
 				{
-					OnColumnChanged(placeholder.Column, Column);
+					OnColumnChanged(placeholder.Column, Column, NewRow);
 				}
 				if (placeholder.Row != Row)
 				{
@@ -73,9 +73,9 @@ namespace DragAndDropFluid.Adapters
 			return (lastRow + 1, true);
 		}
 
-		private void HandleItemsInNewColumn(int newColumn)
+		private void HandleItemsInNewColumn(int newColumn, int row)
 		{
-			var columnElements = view.DragableItems.FindAll(p => p.Column == newColumn && p.Row >= placeholder.Row).OrderBy(p => p.Row).ToList();
+			var columnElements = view.DragableItems.FindAll(p => p.Index != _currentlySelectedIndex && p.Column == newColumn && p.Row >= row).OrderBy(p => p.Row).ToList();
 
 			if (columnElements.Count != 0)
 			{
@@ -84,12 +84,8 @@ namespace DragAndDropFluid.Adapters
 					var current = columnElements[i];
 					var below = columnElements[i + 1];
 
-					if (current.Index == _currentlySelectedIndex)
-						continue;
-
 					current.Position.Y = below.Position.Y;
 					current.Row = below.Row;
-
 				}
 
 				var last = columnElements[columnElements.Count - 1];
@@ -100,23 +96,26 @@ namespace DragAndDropFluid.Adapters
 					last.Row += 1;
 				}
 
+				Console.WriteLine($"Done handling new column ({columnElements.Count} modified)");
 			}
 		}
 
 		private void HandleItemsInOldColumn(int oldColumn)
 		{
-			var oldColumnElements = view.DragableItems.FindAll(p => p.Column == oldColumn && p.Row > placeholder.Row).OrderBy(p => p.Row).ToList();
+			var oldColumnElements = view.DragableItems.FindAll(p => p.Index != _currentlySelectedIndex && p.Column == oldColumn && p.Row > placeholder.Row).OrderBy(p => p.Row).ToList();
 
 			if (oldColumnElements.Count == 0)
 				return;
 
-			for (int i = 1; i < oldColumnElements.Count; i++)
+			foreach (var item in oldColumnElements)
+			{
+				Console.WriteLine(item.Index);
+			}
+
+			for (int i = oldColumnElements.Count - 1; i >= 1; i--)
 			{
 				var above = oldColumnElements[i - 1];
 				var current = oldColumnElements[i];
-
-				if (current.Index == _currentlySelectedIndex)
-					continue;
 
 				current.Position.Y = above.Position.Y;
 				current.Row = above.Row;
@@ -129,12 +128,12 @@ namespace DragAndDropFluid.Adapters
 				first.Position.Y -= first.Size.Y;
 				first.Row -= 1;
 			}
-
+			Console.WriteLine($"Done handling old column ({oldColumnElements.Count} modified)");
 		}
 
-		private void OnColumnChanged(int oldColumn, int newColumn)
+		private void OnColumnChanged(int oldColumn, int newColumn, int row)
 		{
-			HandleItemsInNewColumn(newColumn);
+			HandleItemsInNewColumn(newColumn, row);
 			HandleItemsInOldColumn(oldColumn);
 		}
 
@@ -146,6 +145,8 @@ namespace DragAndDropFluid.Adapters
 
 			itemAbove.Position.Y = oldRow * itemAbove.Size.Y;
 			itemAbove.Row = oldRow;
+
+			Console.WriteLine("Handled ascending rows");
 		}
 
 		private void HandleDescendingRow(int oldRow)
@@ -156,6 +157,8 @@ namespace DragAndDropFluid.Adapters
 
 			itemBelow.Position.Y = oldRow * itemBelow.Size.Y;
 			itemBelow.Row = oldRow;
+
+			Console.WriteLine("Handled descending rows");
 		}
 
 		private void OnRowChanged(int oldRow, int newRow)

@@ -1,11 +1,14 @@
 ﻿@using DragAndDropFluid.Misc
 @using DragAndDropFluid.Model
-
 <div 
-	class="nsdiv noselect"
-	 style="box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;left:@(Position.X)px;top:@(Position.Y)px;position:absolute;background:#50586D;width:@(Size.X)px;height:@(Size.Y)px"
+	 class="nsdiv noselect"
+	 style="touch-action:none;border-radius: 25px;box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;left:@(Position.X)px;top:@(Position.Y)px;position:absolute;background:#50586D;width:@(Size.X)px;height:@(Size.Y)px"
 	 @onmousedown="OnMouseDown" 
 	 @onmouseup="OnMouseUp"
+
+	 @ontouchstart="OnTouchStart"
+	 @ontouchend="OnTouchEnd"
+	 
 	 >
 	@ChildContent
 	<p>Index is @Index</p>
@@ -14,7 +17,6 @@
 </div>
 
 @code {
-
 	[Parameter] public Point2d? Position { get; set; }
 	[Parameter] public Point2d? Size { get; set; }
 
@@ -51,17 +53,23 @@
 		Index = Parent.AddDragItem(this);
 	}
 
+	private void OnTouchStart(TouchEventArgs e)
+	{
+		Parent?.NotifyTouchStart(e, Index);
+	}
+
+	private void OnTouchEnd(TouchEventArgs e)
+	{
+		Parent?.NotifyTouchEnd(e);
+	}
+
 	private void OnMouseDown(MouseEventArgs e)
 	{
-		if (Parent == null)
-			return;
-		Parent.NotifyMouseDown(Index);
+		Parent?.NotifyMouseDown(Index);
 	}
 
 	private void OnMouseUp(MouseEventArgs e)
 	{
-		if (Parent == null)
-			return;
-		Parent.NotifyMouseUp();
+		Parent?.NotifyMouseUp();
 	}
 }
