@@ -1,6 +1,6 @@
 ﻿@page "/"
 @using DragAndDropFluid.Model
-@using DragAndDropFluid.Pages.Components
+@using DragAndDropFluid.Pages.Views
 <center><p>- 1 - </p></center>
 <PageTitle>Home</PageTitle>
 
@@ -8,14 +8,14 @@
 
 <b>!This is only a proof of concept!</b>
 
-<DragContainer Width="1000px" Height="1000px">
-	<DragableDiv Position="Position1" Size="Size1">
-	</DragableDiv>
-	<DragableDiv Position="Position2" Size="Size2">
-	</DragableDiv>
-	<DragableDiv Position="Position3" Size="Size3">
-	</DragableDiv>
-</DragContainer>
+<DragContainerView Width="1000px" Height="1000px">
+	<DragableItemView Position="Position1" Size="Size1">
+	</DragableItemView>
+	<DragableItemView Position="Position2" Size="Size2">
+	</DragableItemView>
+	<DragableItemView Position="Position3" Size="Size3">
+	</DragableItemView>
+</DragContainerView>
 
 @code{
 	private Point2d Position1 = new Point2d(0, 0);

@@ -18,7 +18,7 @@
 	[Parameter] public Point2d? Position { get; set; }
 	[Parameter] public Point2d? Size { get; set; }
 
-	[CascadingParameter] public DragContainer? Parent { get; set; }
+	[CascadingParameter] public DragContainerView? Parent { get; set; }
 	[Parameter] public RenderFragment? ChildContent { get; set; }
 
 	public int Column { get; set; }

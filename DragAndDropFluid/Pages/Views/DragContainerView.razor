@@ -4,8 +4,8 @@
 
 <div style="width:@Width;height:@Height;background:#918f87;position:relative" @onmousemove="OnMouseMove">
 	<CascadingValue Value="@this">
-		<Placeholder @ref="PlaceHolder">
-		</Placeholder>
+		<PlaceholderView @ref="PlaceHolder">
+		</PlaceholderView>
 
 		@ChildContent
 	</CascadingValue>
@@ -17,9 +17,9 @@
 	[Parameter] public string Height { get; set; }
 	[Parameter] public RenderFragment ChildContent { get; set; }
 
-	public List<DragableDiv> DragableItems { get; private set; } = [];
+	public List<DragableItemView> DragableItems { get; private set; } = [];
 
-	public Placeholder PlaceHolder { get; set; }
+	public PlaceholderView PlaceHolder { get; set; }
 
 	private DragAdapter _adapter;
 
@@ -37,7 +37,7 @@
 		_adapter.DragMove(e.MovementX, e.MovementY);
 	}
 
-	public int AddDragItem(DragableDiv item)
+	public int AddDragItem(DragableItemView item)
 	{
 		DragableItems.Add(item);
 		return DragableItems.Count - 1;

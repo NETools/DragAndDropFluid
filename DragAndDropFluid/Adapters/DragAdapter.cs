@@ -1,13 +1,13 @@
 ﻿using DragAndDropFluid.Misc;
 using DragAndDropFluid.Model;
-using DragAndDropFluid.Pages.Components;
+using DragAndDropFluid.Pages.Views;
 using System.ComponentModel;
 
 namespace DragAndDropFluid.Adapters
 {
-	public class DragAdapter(DragContainer view, Placeholder placeholder)
+	public class DragAdapter(DragContainerView view, PlaceholderView placeholder)
 	{
-		private DragableDiv? _currentlySelectedItem;
+		private DragableItemView? _currentlySelectedItem;
 		private int _currentlySelectedIndex = -1;
 
 		public void DragStart(int selectedIndex)
